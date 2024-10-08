@@ -1,0 +1,63 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Tournament {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  isPublic    Boolean  @default(false)
+  isPromoted  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  teams       Team[]
+  matchups    Matchup[]
+}
+
+model Team {
+  id           Int        @id @default(autoincrement())
+  name         String
+  members      String[]
+  tournamentId Int
+  tournament   Tournament @relation(fields: [tournamentId], references: [id])
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+}
+
+model Matchup {
+  id           Int        @id @default(autoincrement())
+  round        Int
+  teamAId      Int
+  teamBId      Int
+  winnerId     Int?
+  tournamentId Int
+  tournament   Tournament @relation(fields: [tournamentId], references: [id])
+  points       Int?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  role      String   @default("user")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Bet {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  matchupId Int
+  teamId    Int
+  amount    Float
+  odds      Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
